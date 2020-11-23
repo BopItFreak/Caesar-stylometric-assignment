@@ -1,0 +1,15 @@
+{
+  "name": "school-latin-project",
+  "version": "1.0.0",
+  "description": "This project scrapes Caesar's de bello gallico text off the web, and analyzes it in various ways.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index"
+  },
+  "author": "August Berchelmann",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "node-fetch": "^2.6.1"
+  }
+}
