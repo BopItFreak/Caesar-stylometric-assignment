@@ -7,7 +7,9 @@ global.fetch = require("node-fetch");
 //import Caesar class.
 global.Caesar = require("./caesar.js");
 
+//instantiate new instance of "Caesar" class.
 let caesar = new Caesar();
 caesar.getCaesarText().then((caesarText) => {
-  console.log(caesarText);
+  console.log(`Average Sentence Length By Words: ${caesar.getAverageSentenceLengthByWords(caesarText)}`);
+  console.log(`Average Sentence Length By Characters: ${caesar.getAverageSentenceLengthByCharacters(caesarText)}`);
 })
