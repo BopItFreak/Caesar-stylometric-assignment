@@ -72,15 +72,24 @@ class Caesar {
     return caesarBook;
   }
   /**
-   * Splits the entire text into sentences.
+   * Gets the entire text object.
    * @param {string} caesarText
    */
-  getSentences(caesarText) {
+  getFullText(caesarText) {
     let fullText = "";
     //put the entire text into one string.
     for (let book of caesarText) {
       fullText = fullText.concat(" " + book.text);
     }
+    return fullText;
+  }
+  /**
+   * Splits the entire text into sentences.
+   * @param {string} caesarText
+   */
+  getSentences(caesarText) {
+    //get full text
+    let fullText = this.getFullText(caesarText);
     //using an external module for parsing sentences, as some sentences are tricky with names, like "C. Caesare"
     let sentences = tokenizer.sentences(fullText, {
       //tell the tokenizer to note these various latin abbreviations.
@@ -119,12 +128,41 @@ class Caesar {
       //split the word by each character.
       let words = sentence.split("");
       //filter out spaces.
-      words = words.filter((char) => char !== " ");
+      words = words.filter((char) => (char !== " " && char !== ""));
       //equivilant to totalCharCount = totalCharCount + words.length;
       totalCharCount += words.length;
     }
     //return the totalCharCount divided by the total number of characters.
     return totalCharCount / sentences.length;
+  }
+  /**
+   * Gets an array of every word in the text.
+   * @param {string} caesarText
+   */
+  getAllWords(caesarText) {
+    //get full text
+    let fullText = this.getFullText(caesarText);
+    //remove punctuation
+    fullText = this.removePunctuation(fullText);
+    //get words and filter out spaces
+    let words = fullText.split(" ").filter((char) => (char !== " " && char !== ""));
+    return words;
+  }
+  /**
+   * Gets most common words.
+   * @param {array} words
+   */
+  getMostCommonWords(words, stockWords = []) {
+    //filter out stock words
+    words = words.filter((word) => !stockWords.includes(word));
+
+    //https://stackoverflow.com/a/35101824/10972030 -> get fequencies of each word
+    let wordFrequencies = new Map([...new Set(words)].map(
+      x => [x, words.filter(y => y === x).length]
+    ));
+    //get the entries iterator, and use spread syntax to convert to array. Sort by frequency.
+    let wordFrequenciesSorted = [...wordFrequencies.entries()].sort((ab, bc) => bc[1] - ab[1] || bc[0] - ab[0]);
+    return wordFrequenciesSorted; 
   }
 
 }
