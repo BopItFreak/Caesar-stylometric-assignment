@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Caesar Analysis</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline@0.2.2/src/chartjs-plugin-trendline.min.js">
+  </script>
+</head>
+
+<body> 
+  <div style="height:75%">
+    <canvas id="canvas" width="400" height="150"></canvas>
+  </div>
+  <p id="labels">Sentences Per Label: (50)</p>
+  <div class="slidecontainer">
+    <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+  </div>
+  <p id="data"></p>
+  <p id="mcw">Most Common Words:<br></p>
+  <p id="mcwwsw">Most Common Words Without Stock Words:<br></p>
+  <script>
+    let labels = [];
+    function updateLabelsNum(num, caesarData) {
+      labels = [];
+      for (let i = 0; i < caesarData.sentences.length; i++) {
+        if (i % num == 0)
+          labels = labels.concat(i.toString());         
+      }
+      config.data.labels = labels;
+    }
+    fetch("http://localhost:3001/data", {
+      "mode": "cors",
+    }).then((res) => {
+      res.json().then((caesarData) => {
+        document.getElementById("data").innerHTML = `Average Sentence Length By Words: <b>${caesarData.averageSentenceLengthByWords}</b><br></br>
+        Average Sentence Length By Characters: <b>${caesarData.averageSentenceLengthByCharacters}</b>
+        `;
+        for (let i = 0; i < 50; i++) {
+          document.getElementById("mcwwsw").innerHTML = document.getElementById("mcwwsw").innerHTML + `${i + 1}. ${caesarData.mostCommonWordsWithoutStockWords[i][0]}: <b>${caesarData.mostCommonWordsWithoutStockWords[i][1]}</b><br>\n`
+        }
+        for (let i = 0; i < 50; i++) {
+          document.getElementById("mcw").innerHTML = document.getElementById("mcw").innerHTML + `${i + 1}. ${caesarData.mostCommonWords[i][0]}: <b>${caesarData.mostCommonWords[i][1]}</b><br>\n`
+        }
+        var ctx = document.getElementById('canvas');
+        window.chartColors = {
+          "red": "rgb(255, 99, 132)",
+          "orange": "rgb(255, 159, 64)",
+          "yellow": "rgb(255, 205, 86)",
+          "green": "rgb(75, 192, 192)",
+          "blue": "rgb(54, 162, 235)",
+          "purple": "rgb(153, 102, 255)",
+          "grey": "rgb(201, 203, 207)"
+        }   
+        console.log(labels)
+        window.config = {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Caesar Sentence Length By Words',
+              backgroundColor: window.chartColors.red,
+              borderColor: window.chartColors.red,
+              data: caesarData.sentences.map((sentence) => sentence.wordCount),
+              fill: false,
+              /*trendlineLinear: {
+                style: "rgb(43 ,66 ,255, 0.3)",
+                lineStyle: "dotted|solid",
+                width: 10
+              }*/
+            }, {
+              label: 'Caesar Sentence Length By Characters',
+              fill: false,
+              backgroundColor: window.chartColors.blue,
+              borderColor: window.chartColors.blue,
+              data: caesarData.sentences.map((sentence) => sentence.charCount),
+              /*trendlineLinear: {
+                style: "rgb(43 ,66 ,255, 0.3)",
+                lineStyle: "dotted|solid",
+                width: 10
+              }*/
+            }]
+          },
+          options: {
+            responsive: true,
+            title: {
+              display: true,
+              text: 'Caesar Analysis'
+            },
+            tooltips: {
+              mode: 'index',
+              intersect: false,
+            },
+            hover: {
+              mode: 'nearest',
+              intersect: true
+            },
+            scales: {
+              xAxes: [{
+                display: true,
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Word/Character Count'
+                }
+              }],
+              yAxes: [{
+                display: true,
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Sentence Number'
+                }
+              }]
+            }
+          },
+        };
+        updateLabelsNum(50, caesarData);
+        var myLineChart = new Chart(ctx, config);
+        let slider = document.getElementById("myRange").oninput = function() {
+          document.getElementById("labels").innerText = `Sentences Per Label: (${this.value})`;    
+          updateLabelsNum(this.value, caesarData);
+          myLineChart.update(); 
+        }
+      })
+    })
+  </script>
+</body>
+
+</html>

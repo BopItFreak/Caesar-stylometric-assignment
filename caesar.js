@@ -16,7 +16,7 @@ class Caesar {
    * @param {string} text
    */
   removePunctuation(text) {
-    return text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    return text.replace(/[.,\/#!$%\^&\*;:"{}=\-_`~()]/g,"");
   }
   /**
    * Gets de bello gallico text.
@@ -98,6 +98,16 @@ class Caesar {
     return sentences;
   }
   /**
+   * Splits the entire text into sentences, and outputs word and character count.
+   * @param {string} caesarText
+   */
+  getSentencesWithWordAndCharacterCount(caesarText) {
+    //get sentences
+    let sentences = this.getSentences(caesarText);
+    //add data
+    return sentences.map((sentence) => ({"sentence": sentence, "wordCount": this.getWords(sentence).length, "charCount": sentence.length}));
+  }
+  /**
    * Gets the average sentence length by the number of words.
    * @param {string} caesarText
    */
@@ -144,8 +154,19 @@ class Caesar {
     let fullText = this.getFullText(caesarText);
     //remove punctuation
     fullText = this.removePunctuation(fullText);
-    //get words and filter out spaces
-    let words = fullText.split(" ").filter((char) => (char !== " " && char !== ""));
+    //get words and filter out spaces and quotations
+    let words = fullText.split(" ").filter(char => (char !== " " && char !== ""));
+    return words;
+  }
+  /**
+   * Gets an array of every word in a string.
+   * @param {string} str
+   */
+  getWords(str) {
+    //remove punctuation
+    str = this.removePunctuation(str);
+    //get words and filter out spaces and quotations
+    let words = str.split(" ").filter(char => (char !== " " && char !== ""));
     return words;
   }
   /**

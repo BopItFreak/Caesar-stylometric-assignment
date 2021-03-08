@@ -11,11 +11,24 @@ global.Caesar = require("./caesar.js");
 
 //instantiate new instance of "Caesar" class.
 let caesar = new Caesar();
+
+//express web server
+const express = require('express')
+const app = express();
+const port = 3001;
+app.use(require("cors")());
+
+app.listen(port);
+
 //Part 1 and 2: get Caesar Text and format it.
-caesar.getCaesarText().then((caesarText) => {
+(async () => {
+  let caesarText = await caesar.getCaesarText()
+  let sentences = caesar.getSentencesWithWordAndCharacterCount(caesarText);
   //Part 3: Analysis of Sentence and Clause Length
-  console.log(`Average Sentence Length By Words: ${caesar.getAverageSentenceLengthByWords(caesarText)}`);
-  console.log(`Average Sentence Length By Characters: ${caesar.getAverageSentenceLengthByCharacters(caesarText)}`);
+  let averageSentenceLengthByWords = caesar.getAverageSentenceLengthByWords(caesarText);
+  let averageSentenceLengthByCharacters = caesar.getAverageSentenceLengthByCharacters(caesarText);
+  console.log(`Average Sentence Length By Words: ${averageSentenceLengthByWords}`);
+  console.log(`Average Sentence Length By Characters: ${averageSentenceLengthByCharacters}`);
   //unfortunatly the text from thelatinlibrary does not have paragraphgs, so part 4 is impossible.
 
   //Part 5: Stop Words
@@ -35,5 +48,9 @@ caesar.getCaesarText().then((caesarText) => {
     console.log(`${i + 1}. ${mostCommonWordsWithoutStockWords[i][0]}: ${mostCommonWordsWithoutStockWords[i][1]}`)
   }
 
+  app.get('/data', (req, res) => {
+    res.send({"sentences": sentences, "mostCommonWords": mostCommonWords, "mostCommonWordsWithoutStockWords": mostCommonWordsWithoutStockWords, "averageSentenceLengthByWords": averageSentenceLengthByWords, "averageSentenceLengthByCharacters": averageSentenceLengthByCharacters, "stockWords": stockWords});
+  });
+})();
+
   
-})
